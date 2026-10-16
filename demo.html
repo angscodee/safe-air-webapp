@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safe Air, Safe Place - Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a1628;
+      color: #f1f5f9;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 3rem;
+    }
+    
+    .logo {
+      text-align: center;
+    }
+    
+    .logo-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: #94a3b8;
+      font-size: 1.125rem;
+    }
+    
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    .card {
+      background: #162238;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);
+      border-color: #06b6d4;
+    }
+    
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .card p {
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    
+    .badge-info {
+      background: rgba(6, 182, 212, 0.1);
+      color: #06b6d4;
+    }
+    
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    /* Dashboard */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .sidebar {
+      width: 260px;
+      background: #162238;
+      border-right: 1px solid #334155;
+      padding: 2rem 1.5rem;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 2rem;
+    }
+    
+    .logo-sidebar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #334155;
+    }
+    
+    .logo-sidebar .icon {
+      font-size: 2rem;
+    }
+    
+    .logo-sidebar h2 {
+      font-size: 1.125rem;
+      margin: 0;
+    }
+    
+    .logo-sidebar p {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin: 0;
+    }
+    
+    .nav-menu {
+      list-style: none;
+    }
+    
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      background: rgba(6, 182, 212, 0.1);
+      color: #06b6d4;
+    }
+    
+    .alert-banner {
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid #06b6d4;
+      color: #06b6d4;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: #1e2d42;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #334155;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+    
+    .zones-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .zone-card {
+      background: #162238;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .zone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    
+    .status-dot.green {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    
+    .status-dot.red {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+      display: inline-block;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+    }
+    
+    .btn-primary {
+      background: #06b6d4;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #22d3ee;
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    
+    .btn-secondary {
+      background: #1e2d42;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+    }
+    
+    .btn-secondary:hover {
+      background: #162238;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Pantalla de Inicio -->
+  <div id="home" class="home">
+    <div class="logo">
+      <div class="logo-icon">🛡️</div>
+      <h1>Safe Air, Safe Place</h1>
+      <p class="subtitle">Plataforma IoT de Detección Temprana de Fugas de Gas</p>
+    </div>
+    
+    <div class="cards">
+      <div class="card" onclick="showDemo()">
+        <div class="card-icon">📱</div>
+        <h2>Modo Demostración</h2>
+        <p>Experiencia interactiva con datos simulados. Escanea el QR desde tu celular.</p>
+        <span class="badge badge-info">Sin hardware requerido</span>
+      </div>
+      
+      <div class="card" onclick="showLab()">
+        <div class="card-icon">💻</div>
+        <h2>Modo Laboratorio</h2>
+        <p>Conecta el ESP32 por USB y visualiza lecturas reales en tiempo real.</p>
+        <span class="badge badge-warning">Requiere ESP32</span>
+      </div>
+    </div>
+    
+    <p style="color: #94a3b8; font-size: 0.875rem;">
+      Proyecto de investigación - Pre-piloto MEP GLP IoT
+    </p>
+  </div>
+  
+  <!-- Dashboard de Demostración -->
+  <div id="dashboard" class="layout hidden">
+    <div class="sidebar">
+      <div class="logo-sidebar">
+        <div class="icon">🛡️</div>
+        <div>
+          <h2>Safe Air</h2>
+          <p>Safe Place</p>
+        </div>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a class="nav-link active" onclick="showOverview()">
+            <span>🏠</span>
+            <span>Vista General</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="showSimulation()">
+            <span>⚡</span>
+            <span>Simulación</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="showAlerts()">
+            <span>⚠️</span>
+            <span>Centro de Alertas</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid #334155;">
+        <button class="btn btn-secondary" onclick="goHome()" style="width: 100%;">← Salir</button>
+      </div>
+    </div>
+    
+    <div class="main-content">
+      <div class="alert-banner">
+        <span>📱</span>
+        <span><strong>MODO DEMOSTRACIÓN</strong> — DATOS SIMULADOS</span>
+      </div>
+      
+      <div id="content">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modo Laboratorio -->
+  <div id="lab" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem;">
+    <h1>💻 Modo Laboratorio</h1>
+    <p style="color: #94a3b8; margin: 1rem 0 2rem;">Conecta el ESP32 por USB para visualizar lecturas reales</p>
+    
+    <div class="card" style="max-width: 500px; width: 100%; cursor: default;">
+      <div style="text-align: center; padding: 2rem;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🔌</div>
+        <p style="color: #94a3b8; margin-bottom: 2rem;">
+          Esta funcionalidad requiere compilación con TypeScript.
+        </p>
+        <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem;">
+          Para usar el Modo Lab completo:
+        </p>
+        <ol style="text-align: left; color: #94a3b8; font-size: 0.875rem; padding-left: 1.5rem;">
+          <li>Libera espacio en disco</li>
+          <li>Ejecuta: <code style="background: #0a1628; padding: 0.25rem 0.5rem; border-radius: 4px;">npm install</code></li>
+          <li>Ejecuta: <code style="background: #0a1628; padding: 0.25rem 0.5rem; border-radius: 4px;">npm run dev</code></li>
+        </ol>
+      </div>
+      <button class="btn btn-secondary" onclick="goHome()" style="width: 100%;">← Volver al inicio</button>
+    </div>
+  </div>
+
+  <script>
+    // Estado de la aplicación
+    let zones = [
+      { id: 1, name: 'Cocina Principal', status: 'normal', delta: 15 },
+      { id: 2, name: 'Almacén', status: 'normal', delta: 12 },
+      { id: 3, name: 'Área de Preparación', status: 'normal', delta: 8 }
+    ];
+    
+    let alerts = [];
+    
+    // Navegación
+    function goHome() {
+      document.getElementById('home').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('lab').classList.add('hidden');
+    }
+    
+    function showDemo() {
+      document.getElementById('home').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      document.getElementById('lab').classList.add('hidden');
+      showOverview();
+    }
+    
+    function showLab() {
+      document.getElementById('home').classList.add('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('lab').classList.remove('hidden');
+    }
+    
+    // Vistas del dashboard
+    function showOverview() {
+      const normalCount = zones.filter(z => z.status === 'normal').length;
+      const alertCount = zones.filter(z => z.status === 'alert').length;
+      const activeAlerts = alerts.filter(a => !a.acknowledged).length;
+      
+      document.getElementById('content').innerHTML = `
+        <h1>Demo Restaurant</h1>
+        <p style="color: #94a3b8; margin-bottom: 2rem;">🍽️ Restaurante • ${zones.length} zonas monitoreadas</p>
+        
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-value" style="color: #10b981;">${normalCount}</div>
+            <div class="stat-label">Zonas Normales</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: #f59e0b;">0</div>
+            <div class="stat-label">Precaución</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: #ef4444;">${alertCount}</div>
+            <div class="stat-label">Alerta</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${activeAlerts}</div>
+            <div class="stat-label">Alertas Activas</div>
+          </div>
+        </div>
+        
+        <h2 style="margin-bottom: 1.5rem;">Estado de Zonas</h2>
+        <div class="zones-grid">
+          ${zones.map(zone => `
+            <div class="zone-card">
+              <div class="zone-header">
+                <h4 style="font-size: 1rem;">${zone.name}</h4>
+                <span class="status-dot ${zone.status}"></span>
+              </div>
+              <p style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem;">kitchen</p>
+              <span class="badge badge-${zone.status === 'alert' ? 'danger' : 'info'}" style="background: rgba(${zone.status === 'alert' ? '239, 68, 68' : '16, 185, 129'}, 0.1); color: ${zone.status === 'alert' ? '#ef4444' : '#10b981'};">
+                ${zone.status === 'alert' ? 'ALERTA' : 'NORMAL'}
+              </span>
+              <div style="margin-top: 1rem; font-size: 0.8125rem; color: #94a3b8;">
+                Delta: ${zone.delta}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      updateActiveNav(0);
+    }
+    
+    function showSimulation() {
+      document.getElementById('content').innerHTML = `
+        <h2>Simulación de Fugas</h2>
+        <div class="alert-banner" style="margin-bottom: 1.5rem;">
+          <span>📱</span>
+          <span>Los eventos simulados se marcan claramente y se separan de los datos reales</span>
+        </div>
+        
+        <div class="zones-grid">
+          ${zones.map(zone => `
+            <div class="zone-card">
+              <h4 style="margin-bottom: 1rem;">${zone.name}</h4>
+              <p style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 1rem;">
+                Estado actual: 
+                <span class="badge badge-${zone.status === 'alert' ? 'danger' : 'info'}" style="background: rgba(${zone.status === 'alert' ? '239, 68, 68' : '16, 185, 129'}, 0.1); color: ${zone.status === 'alert' ? '#ef4444' : '#10b981'};">
+                  ${zone.status === 'alert' ? 'ALERTA' : 'NORMAL'}
+                </span>
+              </p>
+              <button class="btn btn-secondary" onclick="simulateLeak(${zone.id}, 'low')">
+                Fuga Baja (Precaución)
+              </button>
+              <button class="btn btn-danger" onclick="simulateLeak(${zone.id}, 'high')">
+                Fuga Alta (Alerta)
+              </button>
+              <button class="btn btn-secondary" onclick="resetZone(${zone.id})" style="width: 100%; margin-top: 0.5rem;">
+                Reiniciar Zona
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      updateActiveNav(1);
+    }
+    
+    function showAlerts() {
+      const activeAlerts = alerts.filter(a => !a.acknowledged);
+      
+      document.getElementById('content').innerHTML = `
+        <h2>Centro de Alertas</h2>
+        <span class="badge badge-${activeAlerts.length > 0 ? 'danger' : 'info'}" style="background: rgba(${activeAlerts.length > 0 ? '239, 68, 68' : '16, 185, 129'}, 0.1); color: ${activeAlerts.length > 0 ? '#ef4444' : '#10b981'}; margin-bottom: 2rem;">
+          ${activeAlerts.length} activas
+        </span>
+        
+        ${activeAlerts.length === 0 ? `
+          <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+            <p>No hay alertas activas en este momento</p>
+          </div>
+        ` : `
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+            ${activeAlerts.map(alert => `
+              <div class="zone-card" style="border-color: #ef4444;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <span class="badge badge-danger" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">ALERTA</span>
+                  <span style="font-size: 0.8125rem; color: #94a3b8;">
+                    ${new Date(alert.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+                <h4 style="margin-bottom: 0.5rem;">${alert.zoneName}</h4>
+                <p style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 1rem;">
+                  Delta detectado: ${alert.delta}
+                </p>
+                <button class="btn btn-primary" onclick="acknowledgeAlert(${alert.id})">
+                  ✓ Reconocer
+                </button>
+                <button class="btn btn-secondary" onclick="resetZone(${alert.zoneId})">
+                  Reiniciar Zona
+                </button>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; font-size: 0.875rem;">
+                  <strong style="color: #ef4444;">⚠️ Protocolo de Seguridad:</strong>
+                  <ol style="margin: 0.5rem 0 0 1.5rem; color: #94a3b8;">
+                    <li>No manipular interruptores eléctricos</li>
+                    <li>Ventilar el área de forma segura</li>
+                    <li>Alejarse del área afectada</li>
+                    <li>Contactar servicios de emergencia si es necesario</li>
+                  </ol>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `}
+      `;
+      
+      updateActiveNav(2);
+    }
+    
+    // Acciones
+    function simulateLeak(zoneId, intensity) {
+      const zone = zones.find(z => z.id === zoneId);
+      if (!zone) return;
+      
+      zone.status = 'alert';
+      zone.delta = intensity === 'high' ? 450 : 180;
+      
+      alerts.push({
+        id: Date.now(),
+        zoneId: zone.id,
+        zoneName: zone.name,
+        delta: zone.delta,
+        timestamp: Date.now(),
+        acknowledged: false
+      });
+      
+      showSimulation();
+      
+      // Mostrar notificación
+      alert(`🚨 ALERTA ACTIVADA\n\nZona: ${zone.name}\nDelta: ${zone.delta}\n\nRevisa el Centro de Alertas`);
+    }
+    
+    function resetZone(zoneId) {
+      const zone = zones.find(z => z.id === zoneId);
+      if (!zone) return;
+      
+      zone.status = 'normal';
+      zone.delta = Math.floor(Math.random() * 20);
+      
+      const currentView = document.querySelector('.nav-link.active').textContent.trim();
+      if (currentView.includes('Simulación')) {
+        showSimulation();
+      } else if (currentView.includes('Alertas')) {
+        showAlerts();
+      } else {
+        showOverview();
+      }
+    }
+    
+    function acknowledgeAlert(alertId) {
+      const alert = alerts.find(a => a.id === alertId);
+      if (alert) {
+        alert.acknowledged = true;
+        showAlerts();
+      }
+    }
+    
+    function updateActiveNav(index) {
+      document.querySelectorAll('.nav-link').forEach((link, i) => {
+        if (i === index) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

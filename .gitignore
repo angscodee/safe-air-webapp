@@ -1,0 +1,17 @@
+node_modules/
+.DS_Store
+*.log
+.vscode/
+__pycache__/
+*.pyc
+.env
+dist/
+src/
+*.ts
+*.md
+!README.md
+package.json
+tsconfig.json
+vite.config.ts
+vercel.json
+.vercelignore
