@@ -905,6 +905,11 @@
       .isometric-scene {
         max-width: 300px;
       }
+      
+      .modal {
+        max-width: 95%;
+        max-height: 85vh;
+      }
     }
     
     @media (max-width: 768px) {
@@ -931,6 +936,67 @@
       .btn {
         width: 100%;
         justify-content: center;
+      }
+      
+      .modal-overlay {
+        padding: 1rem;
+      }
+      
+      .modal {
+        max-width: 100%;
+        max-height: 90vh;
+      }
+      
+      .modal-header, .modal-body, .modal-footer {
+        padding: 1.25rem;
+      }
+      
+      .modal-title {
+        font-size: 1.25rem;
+      }
+      
+      .modal-description {
+        font-size: 0.875rem;
+      }
+      
+      .scenario-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-label {
+        font-size: 0.875rem;
+      }
+      
+      .modal-footer {
+        flex-direction: column-reverse;
+      }
+      
+      .modal-footer .btn {
+        width: 100%;
+      }
+      
+      /* Notificaciones responsive */
+      .notification {
+        left: 1rem;
+        right: 1rem;
+        max-width: calc(100% - 2rem);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .brand-lockup {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .canvas-title {
+        font-size: 1.5rem;
+      }
+      
+      .canvas-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
       }
     }
   </style>
@@ -1164,34 +1230,63 @@
   <div id="simulatorModal" class="modal-overlay hidden">
     <div class="modal">
       <div class="modal-header">
-        <h2 class="modal-title">Pon a prueba tu entorno</h2>
-        <p class="modal-description">Selecciona un escenario y observa cómo responde el sistema</p>
+        <h2 class="modal-title">Simulador de Escenarios</h2>
+        <p class="modal-description">Configure parámetros específicos para la simulación</p>
       </div>
       
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Zona afectada</label>
-          <select class="form-select" id="simulatorZone">
+          <label class="form-label">Zona Principal</label>
+          <select class="form-select" id="simulatorZone" onchange="updateSubzones()">
             <option value="">Seleccionar zona...</option>
           </select>
         </div>
         
+        <div class="form-group" id="subzoneGroup" style="display: none;">
+          <label class="form-label">Ubicación Específica</label>
+          <select class="form-select" id="simulatorSubzone">
+            <option value="">Seleccionar ubicación...</option>
+          </select>
+        </div>
+        
+        <div class="form-group" id="applianceGroup" style="display: none;">
+          <label class="form-label">Artefacto / Fuente</label>
+          <select class="form-select" id="simulatorAppliance">
+            <option value="">Seleccionar artefacto...</option>
+          </select>
+        </div>
+        
         <div class="form-group">
-          <label class="form-label">Escenario de simulación</label>
+          <label class="form-label">Nivel de Fuga</label>
           <div class="scenario-grid">
             <div class="scenario-card" onclick="selectScenario('minor')">
-              <div class="scenario-title">Fuga Menor</div>
-              <div class="scenario-desc">Incremento gradual - Umbral de precaución</div>
+              <div class="scenario-title">Menor</div>
+              <div class="scenario-desc">180-250 ppm • Gradual</div>
             </div>
             <div class="scenario-card" onclick="selectScenario('major')">
-              <div class="scenario-title">Fuga Significativa</div>
-              <div class="scenario-desc">Incremento rápido - Umbral de alerta</div>
+              <div class="scenario-title">Significativa</div>
+              <div class="scenario-desc">300-400 ppm • Rápida</div>
             </div>
             <div class="scenario-card" onclick="selectScenario('critical')">
-              <div class="scenario-title">Fuga Crítica</div>
-              <div class="scenario-desc">Incremento súbito - Alerta inmediata</div>
+              <div class="scenario-title">Crítica</div>
+              <div class="scenario-desc">450-600 ppm • Inmediata</div>
             </div>
           </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Duración de la Simulación</label>
+          <select class="form-select" id="simulatorDuration">
+            <option value="30">30 segundos (Demo rápida)</option>
+            <option value="60" selected>1 minuto (Demo estándar)</option>
+            <option value="120">2 minutos (Demo extendida)</option>
+            <option value="300">5 minutos (Observación prolongada)</option>
+          </select>
+        </div>
+        
+        <div id="simulatorSummary" style="display: none; background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+          <div style="font-size: 0.875rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 0.5rem;">Resumen de Configuración</div>
+          <div id="summaryContent" style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6;"></div>
         </div>
       </div>
       
@@ -1218,11 +1313,105 @@
       history: [],
       simulationConfig: {
         zone: null,
-        scenario: null
+        subzone: null,
+        appliance: null,
+        scenario: null,
+        duration: 60
       },
       valves: {
         main: 'open',  // Válvula principal
         zones: {}      // Estado de válvulas por zona
+      }
+    };
+    
+    // Definiciones de subzonas y artefactos
+    const subzoneDefinitions = {
+      restaurant: {
+        1: { // Cocina Principal
+          subzones: [
+            { id: 'main-left', name: 'Estación Izquierda' },
+            { id: 'main-center', name: 'Estación Central' },
+            { id: 'main-right', name: 'Estación Derecha' },
+            { id: 'prep-area', name: 'Área de Preparación' }
+          ],
+          appliances: [
+            { id: 'stove-1', name: 'Cocina Industrial #1 (6 hornillas)' },
+            { id: 'stove-2', name: 'Cocina Industrial #2 (4 hornillas)' },
+            { id: 'oven-main', name: 'Horno Principal' },
+            { id: 'grill', name: 'Parrilla/Grill' },
+            { id: 'fryer', name: 'Freidora Industrial' },
+            { id: 'connection-main', name: 'Conexión Principal de Gas' }
+          ]
+        },
+        2: { // Almacén
+          subzones: [
+            { id: 'dry-storage', name: 'Almacén Seco' },
+            { id: 'cold-storage', name: 'Cámara Fría' },
+            { id: 'tank-area', name: 'Área de Tanques' }
+          ],
+          appliances: [
+            { id: 'heater', name: 'Calentador de Agua' },
+            { id: 'tank-connection', name: 'Conexión de Tanque' },
+            { id: 'valve-assembly', name: 'Ensamblaje de Válvulas' },
+            { id: 'regulator', name: 'Regulador de Presión' }
+          ]
+        },
+        3: { // Área de Preparación
+          subzones: [
+            { id: 'prep-station-1', name: 'Estación de Preparación 1' },
+            { id: 'prep-station-2', name: 'Estación de Preparación 2' },
+            { id: 'wash-area', name: 'Área de Lavado' }
+          ],
+          appliances: [
+            { id: 'burner-1', name: 'Quemador Auxiliar #1' },
+            { id: 'burner-2', name: 'Quemador Auxiliar #2' },
+            { id: 'water-heater', name: 'Calentador de Agua' },
+            { id: 'connection-sec', name: 'Conexión Secundaria' }
+          ]
+        }
+      },
+      home: {
+        1: { // Cocina
+          subzones: [
+            { id: 'stove-area', name: 'Área de Cocina' },
+            { id: 'counter-left', name: 'Mesón Izquierdo' },
+            { id: 'counter-right', name: 'Mesón Derecho' },
+            { id: 'pantry', name: 'Despensa' }
+          ],
+          appliances: [
+            { id: 'stove', name: 'Cocina (Hornilla Frontal Izquierda)' },
+            { id: 'stove-fr', name: 'Cocina (Hornilla Frontal Derecha)' },
+            { id: 'stove-bl', name: 'Cocina (Hornilla Trasera Izquierda)' },
+            { id: 'stove-br', name: 'Cocina (Hornilla Trasera Derecha)' },
+            { id: 'oven', name: 'Horno' },
+            { id: 'water-heater', name: 'Calentador de Agua' },
+            { id: 'connection', name: 'Conexión de Suministro' }
+          ]
+        },
+        2: { // Sala de Estar
+          subzones: [
+            { id: 'main-area', name: 'Área Principal' },
+            { id: 'entrance', name: 'Entrada' },
+            { id: 'corner', name: 'Rincón' }
+          ],
+          appliances: [
+            { id: 'heater', name: 'Calefactor a Gas' },
+            { id: 'fireplace', name: 'Chimenea a Gas' },
+            { id: 'connection', name: 'Conexión de Gas' }
+          ]
+        },
+        3: { // Comedor
+          subzones: [
+            { id: 'dining-table', name: 'Área de Mesa' },
+            { id: 'serving-area', name: 'Área de Servicio' },
+            { id: 'wall-side', name: 'Lateral de Pared' }
+          ],
+          appliances: [
+            { id: 'heater', name: 'Calefactor' },
+            { id: 'stove-portable', name: 'Cocina Portátil' },
+            { id: 'connection', name: 'Toma de Gas' }
+          ]
+        }
       }
     };
     
@@ -1434,13 +1623,17 @@
       openSimulator();
       document.getElementById('simulatorZone').value = zoneId;
       state.simulationConfig.zone = zoneId;
+      updateSubzones();
       updateSimulatorButton();
     }
     
     function closeSimulator() {
       document.getElementById('simulatorModal').classList.add('hidden');
-      state.simulationConfig = { zone: null, scenario: null };
+      state.simulationConfig = { zone: null, subzone: null, appliance: null, scenario: null, duration: 60 };
       document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('subzoneGroup').style.display = 'none';
+      document.getElementById('applianceGroup').style.display = 'none';
+      document.getElementById('simulatorSummary').style.display = 'none';
     }
     
     function populateSimulatorZones() {
@@ -1453,62 +1646,164 @@
         option.textContent = zone.name;
         select.appendChild(option);
       });
+    }
+    
+    function updateSubzones() {
+      const zoneId = parseInt(document.getElementById('simulatorZone').value);
+      state.simulationConfig.zone = zoneId || null;
       
-      select.onchange = (e) => {
-        state.simulationConfig.zone = e.target.value ? parseInt(e.target.value) : null;
+      const subzoneGroup = document.getElementById('subzoneGroup');
+      const applianceGroup = document.getElementById('applianceGroup');
+      const subzoneSelect = document.getElementById('simulatorSubzone');
+      const applianceSelect = document.getElementById('simulatorAppliance');
+      
+      if (!zoneId) {
+        subzoneGroup.style.display = 'none';
+        applianceGroup.style.display = 'none';
         updateSimulatorButton();
-      };
+        return;
+      }
+      
+      const envType = state.environment;
+      const definitions = subzoneDefinitions[envType]?.[zoneId];
+      
+      if (definitions) {
+        // Poblar subzonas
+        subzoneSelect.innerHTML = '<option value="">Seleccionar ubicación...</option>';
+        definitions.subzones.forEach(sz => {
+          const option = document.createElement('option');
+          option.value = sz.id;
+          option.textContent = sz.name;
+          subzoneSelect.appendChild(option);
+        });
+        
+        subzoneSelect.onchange = () => {
+          state.simulationConfig.subzone = subzoneSelect.value || null;
+          updateSimulatorButton();
+        };
+        
+        // Poblar artefactos
+        applianceSelect.innerHTML = '<option value="">Seleccionar artefacto...</option>';
+        definitions.appliances.forEach(app => {
+          const option = document.createElement('option');
+          option.value = app.id;
+          option.textContent = app.name;
+          applianceSelect.appendChild(option);
+        });
+        
+        applianceSelect.onchange = () => {
+          state.simulationConfig.appliance = applianceSelect.value || null;
+          updateSimulatorButton();
+        };
+        
+        subzoneGroup.style.display = 'block';
+        applianceGroup.style.display = 'block';
+      } else {
+        subzoneGroup.style.display = 'none';
+        applianceGroup.style.display = 'none';
+      }
+      
+      updateSimulatorButton();
     }
     
     function selectScenario(scenario) {
       document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
       event.currentTarget.classList.add('selected');
       state.simulationConfig.scenario = scenario;
+      
+      // Actualizar duración en config
+      const durationSelect = document.getElementById('simulatorDuration');
+      state.simulationConfig.duration = parseInt(durationSelect.value);
+      durationSelect.onchange = () => {
+        state.simulationConfig.duration = parseInt(durationSelect.value);
+        updateSimulatorButton();
+      };
+      
       updateSimulatorButton();
     }
     
     function updateSimulatorButton() {
       const btn = document.getElementById('runSimBtn');
-      btn.disabled = !state.simulationConfig.zone || !state.simulationConfig.scenario;
+      const { zone, subzone, appliance, scenario } = state.simulationConfig;
+      
+      const isValid = zone && subzone && appliance && scenario;
+      btn.disabled = !isValid;
+      
+      // Mostrar resumen si todo está completo
+      const summaryDiv = document.getElementById('simulatorSummary');
+      if (isValid) {
+        const zoneObj = state.zones.find(z => z.id === parseInt(zone));
+        const envType = state.environment;
+        const definitions = subzoneDefinitions[envType]?.[parseInt(zone)];
+        const subzoneObj = definitions?.subzones.find(sz => sz.id === subzone);
+        const applianceObj = definitions?.appliances.find(app => app.id === appliance);
+        
+        const scenarioData = {
+          minor: { label: 'Menor', ppm: '180-250 ppm', severity: 'Baja' },
+          major: { label: 'Significativa', ppm: '300-400 ppm', severity: 'Media-Alta' },
+          critical: { label: 'Crítica', ppm: '450-600 ppm', severity: 'Crítica' }
+        };
+        
+        const data = scenarioData[scenario];
+        const duration = state.simulationConfig.duration;
+        
+        document.getElementById('summaryContent').innerHTML = `
+          <strong>Zona:</strong> ${zoneObj.name}<br>
+          <strong>Ubicación:</strong> ${subzoneObj.name}<br>
+          <strong>Fuente:</strong> ${applianceObj.name}<br>
+          <strong>Nivel:</strong> ${data.label} (${data.ppm})<br>
+          <strong>Severidad:</strong> ${data.severity}<br>
+          <strong>Duración:</strong> ${duration < 60 ? duration + 's' : (duration / 60) + ' min'}
+        `;
+        summaryDiv.style.display = 'block';
+      } else {
+        summaryDiv.style.display = 'none';
+      }
     }
     
     function runSimulation() {
-      const { zone: zoneId, scenario } = state.simulationConfig;
+      const { zone: zoneId, subzone, appliance, scenario, duration } = state.simulationConfig;
       const zone = state.zones.find(z => z.id === parseInt(zoneId));
       
       if (!zone) return;
       
-      // Simulate leak
+      // Obtener detalles completos
+      const envType = state.environment;
+      const definitions = subzoneDefinitions[envType]?.[parseInt(zoneId)];
+      const subzoneObj = definitions?.subzones.find(sz => sz.id === subzone);
+      const applianceObj = definitions?.appliances.find(app => app.id === appliance);
+      
+      // Simulate leak con valores precisos
       const deltaValues = {
-        minor: 180,
-        major: 350,
-        critical: 450
+        minor: Math.floor(Math.random() * 71) + 180,    // 180-250
+        major: Math.floor(Math.random() * 101) + 300,   // 300-400
+        critical: Math.floor(Math.random() * 151) + 450 // 450-600
       };
       
       zone.status = 'alert';
       zone.delta = deltaValues[scenario];
       
       // CIERRE AUTOMÁTICO DE VÁLVULAS
-      // 1. Cerrar válvula de la zona afectada
       zone.valve = 'closed';
       state.valves.zones[zone.id] = 'closed';
-      
-      // 2. Cerrar válvula principal (corta suministro a todas las zonas)
       state.valves.main = 'closed';
       
-      // 3. Cerrar válvulas de todas las demás zonas por seguridad
       state.zones.forEach(z => {
         z.valve = 'closed';
         state.valves.zones[z.id] = 'closed';
       });
       
-      // Add alert
+      // Add alert con información detallada
       const alert = {
         id: Date.now(),
         zoneId: zone.id,
         zoneName: zone.name,
+        subzone: subzoneObj?.name,
+        appliance: applianceObj?.name,
         scenario: scenario,
         delta: zone.delta,
+        ppm: zone.delta,
+        duration: duration,
         timestamp: new Date(),
         acknowledged: false,
         valvesClosed: {
@@ -1534,16 +1829,23 @@
         renderZoneDetails(zone);
       }
       
-      // Show notification with valve closure info
-      showNotification(`⚠️ SIMULACIÓN ACTIVADA\n\n` +
-        `Zona: ${zone.name}\n` +
-        `Escenario: ${getScenarioLabel(scenario)}\n` +
-        `Delta: ${zone.delta}\n\n` +
-        `🔒 ACCIÓN AUTOMÁTICA:\n` +
-        `✓ Válvula principal cerrada\n` +
-        `✓ Válvula de zona afectada cerrada\n` +
-        `✓ Todas las válvulas de seguridad cerradas\n\n` +
-        `Revisa el Centro de Alertas para más detalles.`);
+      // Show notification con información específica y tiempo reducido
+      showNotification(
+        `⚠️ SIMULACIÓN ACTIVADA\n\n` +
+        `📍 Ubicación:\n` +
+        `  • Zona: ${zone.name}\n` +
+        `  • Subzona: ${subzoneObj?.name}\n` +
+        `  • Fuente: ${applianceObj?.name}\n\n` +
+        `📊 Parámetros:\n` +
+        `  • Nivel: ${getScenarioLabel(scenario)}\n` +
+        `  • Concentración: ${zone.delta} ppm\n` +
+        `  • Duración: ${duration < 60 ? duration + 's' : (duration / 60) + ' min'}\n\n` +
+        `🔒 Acciones Automáticas:\n` +
+        `  ✓ Válvula principal cerrada\n` +
+        `  ✓ Válvula zona afectada cerrada\n` +
+        `  ✓ Todas las válvulas de seguridad cerradas`,
+        5000 // 5 segundos en lugar de 10
+      );
     }
     
     function getScenarioLabel(scenario) {
@@ -1580,7 +1882,7 @@
       }
     }
     
-    function showNotification(message) {
+    function showNotification(message, duration = 5000) {
       // Crear notificación elegante en lugar de alert() nativo
       const notification = document.createElement('div');
       notification.style.cssText = `
@@ -1620,13 +1922,13 @@
       
       document.body.appendChild(notification);
       
-      // Auto-remover después de 10 segundos
+      // Auto-remover después de la duración especificada
       setTimeout(() => {
         if (notification.parentNode) {
           notification.style.animation = 'slideOut 0.3s ease-in';
           setTimeout(() => notification.remove(), 300);
         }
-      }, 10000);
+      }, duration);
     }
     
     // === VIEW SWITCHING ===
@@ -1761,7 +2063,10 @@
                       </div>
                       <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">${alert.zoneName}</h3>
                       <p style="color: var(--text-secondary); font-size: 0.9375rem;">
-                        Escenario: ${getScenarioLabel(alert.scenario)} • Delta: ${alert.delta}
+                        ${alert.subzone ? alert.subzone + ' • ' : ''}${alert.appliance ? alert.appliance : ''}
+                      </p>
+                      <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem;">
+                        ${getScenarioLabel(alert.scenario)} • ${alert.ppm} ppm ${alert.duration ? '• ' + (alert.duration < 60 ? alert.duration + 's' : (alert.duration / 60) + ' min') : ''}
                       </p>
                     </div>
                     <div class="status-indicator alert"></div>
@@ -1900,7 +2205,7 @@
                               ${event.zoneName}
                             </h3>
                             <p style="color: var(--text-secondary); font-size: 0.875rem;">
-                              ${getScenarioLabel(event.scenario)} • Delta: ${event.delta}
+                              ${event.subzone ? event.subzone + ' • ' : ''}${event.appliance ? event.appliance + ' • ' : ''}${getScenarioLabel(event.scenario)} • ${event.ppm || event.delta} ppm
                             </p>
                           </div>
                           <div style="text-align: right;">
