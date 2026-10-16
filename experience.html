@@ -1194,6 +1194,10 @@
       simulationConfig: {
         zone: null,
         scenario: null
+      },
+      valves: {
+        main: 'open',  // Válvula principal
+        zones: {}      // Estado de válvulas por zona
       }
     };
     
@@ -1237,17 +1241,22 @@
     function initializeEnvironment(type) {
       if (type === 'restaurant') {
         state.zones = [
-          { id: 1, name: 'Cocina Principal', type: 'kitchen', status: 'normal', delta: 15, sensor: true },
-          { id: 2, name: 'Almacén', type: 'storage', status: 'normal', delta: 8, sensor: true },
-          { id: 3, name: 'Área de Preparación', type: 'prep', status: 'normal', delta: 12, sensor: true }
+          { id: 1, name: 'Cocina Principal', type: 'kitchen', status: 'normal', delta: 15, sensor: true, valve: 'open' },
+          { id: 2, name: 'Almacén', type: 'storage', status: 'normal', delta: 8, sensor: true, valve: 'open' },
+          { id: 3, name: 'Área de Preparación', type: 'prep', status: 'normal', delta: 12, sensor: true, valve: 'open' }
         ];
       } else {
         state.zones = [
-          { id: 1, name: 'Cocina', type: 'kitchen', status: 'normal', delta: 10, sensor: true },
-          { id: 2, name: 'Sala de Estar', type: 'living', status: 'normal', delta: 5, sensor: false },
-          { id: 3, name: 'Comedor', type: 'dining', status: 'normal', delta: 7, sensor: true }
+          { id: 1, name: 'Cocina', type: 'kitchen', status: 'normal', delta: 10, sensor: true, valve: 'open' },
+          { id: 2, name: 'Sala de Estar', type: 'living', status: 'normal', delta: 5, sensor: false, valve: 'open' },
+          { id: 3, name: 'Comedor', type: 'dining', status: 'normal', delta: 7, sensor: true, valve: 'open' }
         ];
       }
+      
+      // Initialize valve states
+      state.zones.forEach(zone => {
+        state.valves.zones[zone.id] = 'open';
+      });
       
       // Render overview view
       renderOverviewView();
@@ -1418,6 +1427,20 @@
       zone.status = 'alert';
       zone.delta = deltaValues[scenario];
       
+      // CIERRE AUTOMÁTICO DE VÁLVULAS
+      // 1. Cerrar válvula de la zona afectada
+      zone.valve = 'closed';
+      state.valves.zones[zone.id] = 'closed';
+      
+      // 2. Cerrar válvula principal (corta suministro a todas las zonas)
+      state.valves.main = 'closed';
+      
+      // 3. Cerrar válvulas de todas las demás zonas por seguridad
+      state.zones.forEach(z => {
+        z.valve = 'closed';
+        state.valves.zones[z.id] = 'closed';
+      });
+      
       // Add alert
       const alert = {
         id: Date.now(),
@@ -1426,13 +1449,19 @@
         scenario: scenario,
         delta: zone.delta,
         timestamp: new Date(),
-        acknowledged: false
+        acknowledged: false,
+        valvesClosed: {
+          main: true,
+          affectedZone: zone.id,
+          allZones: state.zones.map(z => z.id)
+        }
       };
       
       state.alerts.push(alert);
       state.history.push({
         ...alert,
-        type: 'simulation'
+        type: 'simulation',
+        action: 'automatic_valve_closure'
       });
       
       // Close modal
@@ -1444,8 +1473,16 @@
         renderZoneDetails(zone);
       }
       
-      // Show notification
-      showNotification(`SIMULACIÓN ACTIVADA\n\nZona: ${zone.name}\nEscenario: ${getScenarioLabel(scenario)}\nDelta: ${zone.delta}\n\nRevisa los detalles de la zona o el centro de alertas.`);
+      // Show notification with valve closure info
+      showNotification(`⚠️ SIMULACIÓN ACTIVADA\n\n` +
+        `Zona: ${zone.name}\n` +
+        `Escenario: ${getScenarioLabel(scenario)}\n` +
+        `Delta: ${zone.delta}\n\n` +
+        `🔒 ACCIÓN AUTOMÁTICA:\n` +
+        `✓ Válvula principal cerrada\n` +
+        `✓ Válvula de zona afectada cerrada\n` +
+        `✓ Todas las válvulas de seguridad cerradas\n\n` +
+        `Revisa el Centro de Alertas para más detalles.`);
     }
     
     function getScenarioLabel(scenario) {
@@ -1463,6 +1500,18 @@
       
       zone.status = 'normal';
       zone.delta = Math.floor(Math.random() * 20);
+      zone.valve = 'open';
+      state.valves.zones[zone.id] = 'open';
+      
+      // Si todas las zonas están normales, reabrir válvula principal
+      const allNormal = state.zones.every(z => z.status === 'normal');
+      if (allNormal) {
+        state.valves.main = 'open';
+        state.zones.forEach(z => {
+          z.valve = 'open';
+          state.valves.zones[z.id] = 'open';
+        });
+      }
       
       renderZones();
       if (state.selectedZone?.id === zone.id) {
