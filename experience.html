@@ -121,6 +121,23 @@
       }
     }
     
+    @keyframes ppmPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
     /* Icons */
     .icon {
       width: 20px;
@@ -769,6 +786,292 @@
       justify-content: center;
     }
     
+    /* === MOBILE NAVIGATION === */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .mobile-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .mobile-nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    
+    .hamburger {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .hamburger span {
+      width: 24px;
+      height: 2px;
+      background: currentColor;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+    
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+    
+    .mobile-nav-menu {
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+    
+    .mobile-nav-menu.open {
+      display: flex;
+      animation: slideUp 0.3s ease-out;
+    }
+    
+    .mobile-nav-item {
+      padding: 0.875rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .mobile-nav-item.active {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+    }
+    
+    .mobile-nav-item:active {
+      transform: scale(0.98);
+    }
+    
+    /* === SIMULATION OVERLAY === */
+    .simulation-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 22, 40, 0.95);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .simulation-container {
+      max-width: 600px;
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--danger);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    .sim-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .sim-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--danger);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .sim-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+    
+    .ppm-display {
+      background: var(--bg-primary);
+      border: 2px solid var(--danger);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      animation: ppmPulse 1.5s ease-in-out infinite;
+    }
+    
+    .ppm-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .ppm-value {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--danger);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    
+    .ppm-unit {
+      font-size: 1rem;
+      color: var(--text-tertiary);
+    }
+    
+    .sim-progress {
+      margin-bottom: 2rem;
+    }
+    
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--warning), var(--danger));
+      transition: width 0.5s ease-out;
+      border-radius: 4px;
+    }
+    
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    
+    .sim-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .sim-action-item {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .sim-action-item.active {
+      border-color: var(--success);
+      background: var(--success-dim);
+    }
+    
+    .sim-action-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .sim-action-label {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+    
+    .sim-action-item.active .sim-action-label {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .sim-timeline {
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    .timeline-item:last-child {
+      border-bottom: none;
+    }
+    
+    .timeline-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      margin-top: 0.375rem;
+      flex-shrink: 0;
+    }
+    
+    .timeline-dot.active {
+      background: var(--success);
+      animation: pulse 1s ease-in-out infinite;
+    }
+    
+    .timeline-content {
+      flex: 1;
+    }
+    
+    .timeline-time {
+      color: var(--text-tertiary);
+      font-size: 0.75rem;
+    }
+    
+    .sim-controls {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .sim-controls .btn {
+      flex: 1;
+    }
+    
     /* === SIMULATOR MODAL === */
     .modal-overlay {
       position: fixed;
@@ -891,10 +1194,19 @@
     @media (max-width: 1024px) {
       #interactiveEnvironment {
         grid-template-columns: 1fr;
+        padding-top: 70px; /* Espacio para mobile nav */
       }
       
       .sidebar, .details-panel {
         display: none;
+      }
+      
+      .mobile-nav {
+        display: block;
+      }
+      
+      .environment-canvas {
+        padding: 1.5rem 1rem;
       }
       
       .welcome-content {
@@ -976,10 +1288,27 @@
       }
       
       /* Notificaciones responsive */
-      .notification {
-        left: 1rem;
-        right: 1rem;
-        max-width: calc(100% - 2rem);
+      .notification, [class*="notification"] {
+        left: 1rem !important;
+        right: 1rem !important;
+        max-width: calc(100% - 2rem) !important;
+        top: 80px !important; /* Debajo del mobile nav */
+      }
+      
+      .simulation-overlay {
+        padding: 1rem;
+      }
+      
+      .simulation-container {
+        padding: 1.5rem;
+      }
+      
+      .ppm-value {
+        font-size: 2.5rem;
+      }
+      
+      .sim-actions {
+        grid-template-columns: 1fr;
       }
     }
     
@@ -1141,6 +1470,51 @@
 
   <!-- INTERACTIVE ENVIRONMENT -->
   <section id="interactiveEnvironment" class="hidden">
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+      <div class="mobile-nav-header">
+        <div class="mobile-nav-brand">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4L4 10V16C4 22 8 26 12 28C16 26 20 22 20 16V10L12 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Aire Seguro
+        </div>
+        <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+      <div class="mobile-nav-menu" id="mobileMenu">
+        <div class="mobile-nav-item active" onclick="showViewMobile('overview')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Vista General
+        </div>
+        <div class="mobile-nav-item" onclick="showViewMobile('alerts')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.29 3.86L1.82 18A2 2 0 003.54 20.985H20.47A2 2 0 0022.193 18L13.71 3.86A2 2 0 0010.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Alertas
+        </div>
+        <div class="mobile-nav-item" onclick="showViewMobile('history')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Historial
+        </div>
+        <div class="mobile-nav-item" onclick="openSimulator(); toggleMobileMenu();">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Simulador
+        </div>
+      </div>
+    </nav>
+    
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="brand-lockup" style="margin-bottom: 2rem;">
@@ -1773,37 +2147,259 @@
       const subzoneObj = definitions?.subzones.find(sz => sz.id === subzone);
       const applianceObj = definitions?.appliances.find(app => app.id === appliance);
       
-      // Simulate leak con valores precisos
-      const deltaValues = {
+      // Close modal
+      closeSimulator();
+      
+      // Iniciar simulación en tiempo real
+      startRealtimeSimulation(zone, subzoneObj, applianceObj, scenario, duration);
+    }
+    
+    // === REALTIME SIMULATION ===
+    let simulationState = {
+      active: false,
+      currentPPM: 0,
+      targetPPM: 0,
+      startTime: null,
+      duration: 0,
+      interval: null,
+      phase: 'detection' // detection, alert, monitoring
+    };
+    
+    function startRealtimeSimulation(zone, subzoneObj, applianceObj, scenario, duration) {
+      if (simulationState.active) return;
+      
+      // Configurar simulación
+      const targetValues = {
         minor: Math.floor(Math.random() * 71) + 180,    // 180-250
         major: Math.floor(Math.random() * 101) + 300,   // 300-400
         critical: Math.floor(Math.random() * 151) + 450 // 450-600
       };
       
-      zone.status = 'alert';
-      zone.delta = deltaValues[scenario];
+      simulationState = {
+        active: true,
+        currentPPM: 10, // Valor inicial normal
+        targetPPM: targetValues[scenario],
+        startTime: Date.now(),
+        duration: duration * 1000, // convertir a ms
+        interval: null,
+        phase: 'detection',
+        zone: zone,
+        subzone: subzoneObj,
+        appliance: applianceObj,
+        scenario: scenario,
+        events: []
+      };
       
-      // CIERRE AUTOMÁTICO DE VÁLVULAS
-      zone.valve = 'closed';
-      state.valves.zones[zone.id] = 'closed';
+      // Crear overlay de simulación
+      createSimulationOverlay();
+      
+      // Iniciar incremento gradual de PPM
+      simulationState.interval = setInterval(updateSimulation, 500); // actualizar cada 0.5s
+      
+      // Log evento inicial
+      addSimulationEvent('Inicio de simulación');
+    }
+    
+    function createSimulationOverlay() {
+      const overlay = document.createElement('div');
+      overlay.className = 'simulation-overlay';
+      overlay.id = 'simulationOverlay';
+      
+      overlay.innerHTML = `
+        <div class="simulation-container">
+          <div class="sim-header">
+            <div class="sim-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.29 3.86L1.82 18A2 2 0 003.54 20.985H20.47A2 2 0 0022.193 18L13.71 3.86A2 2 0 0010.29 3.86Z" fill="#ef4444" stroke="#ef4444" stroke-width="2"/>
+                <path d="M12 9V13M12 17H12.01" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              SIMULACIÓN EN CURSO
+            </div>
+            <div class="sim-subtitle">${simulationState.zone.name} • ${simulationState.subzone?.name}</div>
+          </div>
+          
+          <div class="ppm-display">
+            <div class="ppm-label">Concentración Detectada</div>
+            <div class="ppm-value" id="ppmValue">10</div>
+            <div class="ppm-unit">ppm (Partes por Millón)</div>
+          </div>
+          
+          <div class="sim-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="progress-info">
+              <span id="progressTime">0s</span>
+              <span id="progressPhase">Fase: Detección</span>
+            </div>
+          </div>
+          
+          <div class="sim-actions">
+            <div class="sim-action-item" id="action-sensor">
+              <div class="sim-action-icon">📡</div>
+              <div class="sim-action-label">Sensor Activo</div>
+            </div>
+            <div class="sim-action-item" id="action-valve">
+              <div class="sim-action-icon">🔒</div>
+              <div class="sim-action-label">Válvulas Abiertas</div>
+            </div>
+            <div class="sim-action-item" id="action-alert">
+              <div class="sim-action-icon">⚠️</div>
+              <div class="sim-action-label">Sistema Normal</div>
+            </div>
+            <div class="sim-action-item" id="action-notification">
+              <div class="sim-action-icon">🔔</div>
+              <div class="sim-action-label">Sin Alertas</div>
+            </div>
+          </div>
+          
+          <div class="sim-timeline" id="simTimeline">
+            <div class="timeline-item">
+              <div class="timeline-dot active"></div>
+              <div class="timeline-content">
+                <div>Simulación iniciada</div>
+                <div class="timeline-time">Ahora</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="sim-controls">
+            <button class="btn btn-ghost" onclick="skipSimulation()">Saltar</button>
+            <button class="btn btn-danger" onclick="stopSimulation()">Detener Simulación</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(overlay);
+      
+      // Activar sensor en UI
+      document.getElementById('action-sensor').classList.add('active');
+    }
+    
+    function updateSimulation() {
+      const elapsed = Date.now() - simulationState.startTime;
+      const progress = Math.min(elapsed / simulationState.duration, 1);
+      
+      // Actualizar PPM gradualmente
+      const increment = (simulationState.targetPPM - 10) / (simulationState.duration / 500);
+      simulationState.currentPPM = Math.min(simulationState.currentPPM + increment, simulationState.targetPPM);
+      
+      // Actualizar UI
+      document.getElementById('ppmValue').textContent = Math.round(simulationState.currentPPM);
+      document.getElementById('progressBar').style.width = (progress * 100) + '%';
+      document.getElementById('progressTime').textContent = Math.round(elapsed / 1000) + 's';
+      
+      // Detectar umbrales y cambiar fases
+      if (simulationState.phase === 'detection' && simulationState.currentPPM >= 150) {
+        enterAlertPhase();
+      }
+      
+      // Finalizar si llega al tiempo o alcanza el objetivo
+      if (progress >= 1 || simulationState.currentPPM >= simulationState.targetPPM) {
+        finishSimulation();
+      }
+    }
+    
+    function enterAlertPhase() {
+      simulationState.phase = 'alert';
+      document.getElementById('progressPhase').textContent = 'Fase: Alerta Activada';
+      
+      // Vibrar dispositivo si está disponible
+      if ('vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200, 100, 200]);
+      }
+      
+      // Reproducir sonido de alerta
+      playAlertSound();
+      
+      // Actualizar acciones en UI
+      document.getElementById('action-alert').classList.add('active');
+      document.getElementById('action-alert').querySelector('.sim-action-label').textContent = '¡ALERTA ACTIVADA!';
+      
+      document.getElementById('action-valve').classList.add('active');
+      document.getElementById('action-valve').querySelector('.sim-action-label').textContent = 'Válvulas Cerradas';
+      
+      document.getElementById('action-notification').classList.add('active');
+      document.getElementById('action-notification').querySelector('.sim-action-label').textContent = 'Notificación Enviada';
+      
+      addSimulationEvent('⚠️ Umbral de alerta alcanzado (' + Math.round(simulationState.currentPPM) + ' ppm)');
+      addSimulationEvent('🔒 Cierre automático de válvulas iniciado');
+      addSimulationEvent('🔔 Notificación de emergencia enviada');
+      
+      // Cerrar válvulas en el estado real
+      simulationState.zone.valve = 'closed';
+      state.valves.zones[simulationState.zone.id] = 'closed';
       state.valves.main = 'closed';
-      
       state.zones.forEach(z => {
         z.valve = 'closed';
         state.valves.zones[z.id] = 'closed';
       });
+    }
+    
+    function addSimulationEvent(text) {
+      const timeline = document.getElementById('simTimeline');
+      const item = document.createElement('div');
+      item.className = 'timeline-item';
+      item.innerHTML = `
+        <div class="timeline-dot active"></div>
+        <div class="timeline-content">
+          <div>${text}</div>
+          <div class="timeline-time">Ahora</div>
+        </div>
+      `;
+      timeline.insertBefore(item, timeline.firstChild);
       
-      // Add alert con información detallada
+      // Remover clase active del anterior
+      const dots = timeline.querySelectorAll('.timeline-dot');
+      if (dots.length > 1) {
+        dots[1].classList.remove('active');
+      }
+      
+      simulationState.events.push({ text, timestamp: Date.now() });
+    }
+    
+    function playAlertSound() {
+      // Crear beep de alerta usando Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800; // Frecuencia del beep
+      oscillator.type = 'square';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      
+      // Patrón de beeps: 3 cortos
+      oscillator.start(audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.3);
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.4);
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.5);
+      oscillator.stop(audioContext.currentTime + 0.6);
+    }
+    
+    function finishSimulation() {
+      clearInterval(simulationState.interval);
+      
+      const zone = simulationState.zone;
+      zone.status = 'alert';
+      zone.delta = Math.round(simulationState.currentPPM);
+      
+      // Registrar alerta
       const alert = {
         id: Date.now(),
         zoneId: zone.id,
         zoneName: zone.name,
-        subzone: subzoneObj?.name,
-        appliance: applianceObj?.name,
-        scenario: scenario,
+        subzone: simulationState.subzone?.name,
+        appliance: simulationState.appliance?.name,
+        scenario: simulationState.scenario,
         delta: zone.delta,
         ppm: zone.delta,
-        duration: duration,
+        duration: simulationState.duration / 1000,
         timestamp: new Date(),
         acknowledged: false,
         valvesClosed: {
@@ -1820,33 +2416,69 @@
         action: 'automatic_valve_closure'
       });
       
-      // Close modal
-      closeSimulator();
+      addSimulationEvent('✓ Simulación completada');
       
-      // Update UI
-      renderZones();
-      if (state.selectedZone?.id === zone.id) {
-        renderZoneDetails(zone);
+      // Cambiar botón
+      const overlay = document.getElementById('simulationOverlay');
+      const controls = overlay.querySelector('.sim-controls');
+      controls.innerHTML = `
+        <button class="btn btn-primary" onclick="closeSimulationOverlay()">
+          Ver Resultados
+        </button>
+      `;
+      
+      document.getElementById('progressPhase').textContent = 'Fase: Completada';
+      
+      simulationState.active = false;
+    }
+    
+    function stopSimulation() {
+      if (simulationState.interval) {
+        clearInterval(simulationState.interval);
+      }
+      simulationState.active = false;
+      closeSimulationOverlay();
+    }
+    
+    function skipSimulation() {
+      if (simulationState.interval) {
+        clearInterval(simulationState.interval);
+      }
+      simulationState.currentPPM = simulationState.targetPPM;
+      if (simulationState.phase === 'detection') {
+        enterAlertPhase();
+      }
+      finishSimulation();
+    }
+    
+    function closeSimulationOverlay() {
+      const overlay = document.getElementById('simulationOverlay');
+      if (overlay) {
+        overlay.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => overlay.remove(), 300);
       }
       
-      // Show notification con información específica y tiempo reducido
-      showNotification(
-        `⚠️ SIMULACIÓN ACTIVADA\n\n` +
-        `📍 Ubicación:\n` +
-        `  • Zona: ${zone.name}\n` +
-        `  • Subzona: ${subzoneObj?.name}\n` +
-        `  • Fuente: ${applianceObj?.name}\n\n` +
-        `📊 Parámetros:\n` +
-        `  • Nivel: ${getScenarioLabel(scenario)}\n` +
-        `  • Concentración: ${zone.delta} ppm\n` +
-        `  • Duración: ${duration < 60 ? duration + 's' : (duration / 60) + ' min'}\n\n` +
-        `🔒 Acciones Automáticas:\n` +
-        `  ✓ Válvula principal cerrada\n` +
-        `  ✓ Válvula zona afectada cerrada\n` +
-        `  ✓ Todas las válvulas de seguridad cerradas`,
-        5000 // 5 segundos en lugar de 10
-      );
+      // Actualizar vistas
+      renderZones();
+      if (state.selectedZone?.id === simulationState.zone?.id) {
+        renderZoneDetails(simulationState.zone);
+      }
+      
+      // Mostrar vista de alertas
+      showView({ currentTarget: document.querySelector('[onclick*="alerts"]') });
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelector('[onclick*="alerts"]')?.classList.add('active');
     }
+    
+    // Agregar animación fadeOut
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
     
     function getScenarioLabel(scenario) {
       const labels = {
@@ -1949,6 +2581,40 @@
           break;
         case 'simulator':
           openSimulator();
+          break;
+        case 'alerts':
+          renderAlertsView();
+          break;
+        case 'history':
+          renderHistoryView();
+          break;
+        default:
+          renderOverviewView();
+      }
+    }
+    
+    // === MOBILE NAVIGATION ===
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const hamburger = document.querySelector('.hamburger');
+      menu.classList.toggle('open');
+      hamburger.classList.toggle('active');
+    }
+    
+    function showViewMobile(view) {
+      // Update active mobile nav
+      document.querySelectorAll('.mobile-nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+      
+      // Close menu
+      toggleMobileMenu();
+      
+      // Switch views
+      switch(view) {
+        case 'overview':
+          renderOverviewView();
           break;
         case 'alerts':
           renderAlertsView();
