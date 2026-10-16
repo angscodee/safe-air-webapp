@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explora tu espacio. Comprende el riesgo. Descubre cómo responde el sistema.">
+  <meta name="theme-color" content="#0a1628">
+  <title>Aire Seguro, Hogar Seguro - Experiencia Interactiva IoT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+    
+    :root {
+      --bg-primary: #0a1628;
+      --bg-secondary: #162238;
+      --bg-tertiary: #1e2d42;
+      --bg-elevated: #1f2937;
+      --border-color: #334155;
+      --border-subtle: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-light: #22d3ee;
+      --accent-cyan-dark: #0891b2;
+      --success: #10b981;
+      --success-dim: rgba(16, 185, 129, 0.1);
+      --warning: #f59e0b;
+      --warning-dim: rgba(245, 158, 11, 0.1);
+      --danger: #ef4444;
+      --danger-dim: rgba(239, 68, 68, 0.1);
+      --danger-dark: #dc2626;
+      --unknown: #64748b;
+      
+      /* Animation */
+      --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
+      --ease-in: cubic-bezier(0.4, 0.0, 1, 1);
+      --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+      --duration-fast: 150ms;
+      --duration-base: 250ms;
+      --duration-slow: 350ms;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+    
+    /* Utility Classes */
+    .hidden { display: none !important; }
+    .fade-in { animation: fadeIn var(--duration-base) var(--ease-smooth); }
+    .slide-up { animation: slideUp var(--duration-slow) var(--ease-out); }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes glow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    
+    /* Icons */
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    .icon-md { width: 32px; height: 32px; }
+    .icon-lg { width: 48px; height: 48px; }
+    .icon-xl { width: 80px; height: 80px; }
+    
+    /* Buttons */
+    .btn {
+      padding: 0.875rem 1.75rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all var(--duration-base) var(--ease-smooth);
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:active {
+      transform: scale(0.98);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-cyan-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+    }
+    
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+      border-color: var(--accent-cyan);
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .btn-ghost:hover {
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+    
+    /* === WELCOME SCREEN === */
+    #welcomeScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(ellipse at top, #162238 0%, var(--bg-primary) 70%);
+    }
+    
+    .ambient-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.15;
+    }
+    
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: float 8s ease-in-out infinite;
+    }
+    
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent-cyan);
+      top: -200px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+    
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: var(--success);
+      bottom: -150px;
+      left: -100px;
+      animation-delay: 2s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, 30px); }
+    }
+    
+    .welcome-content {
+      max-width: 1200px;
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    
+    .welcome-text {
+      animation: slideUp var(--duration-slow) var(--ease-out);
+    }
+    
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .brand-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-cyan-dark) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
+    }
+    
+    .brand-text h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 0.25rem;
+    }
+    
+    .brand-text p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.03em;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+    }
+    
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    /* Isometric Scene */
+    .scene-container {
+      position: relative;
+      animation: slideUp var(--duration-slow) var(--ease-out) 200ms backwards;
+    }
+    
+    .isometric-scene {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      position: relative;
+    }
+    
+    .scene-svg {
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+    }
+    
+    .sensor-pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .connection-line {
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: drawLine 2s ease-out forwards;
+    }
+    
+    @keyframes drawLine {
+      to { stroke-dashoffset: 0; }
+    }
+    
+    /* === ENVIRONMENT SELECTOR === */
+    #environmentSelector {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .selector-container {
+      max-width: 900px;
+      width: 100%;
+    }
+    
+    .selector-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .selector-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    
+    .selector-header p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+    }
+    
+    .environment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .env-card {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2.5rem;
+      cursor: pointer;
+      transition: all var(--duration-base) var(--ease-smooth);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .env-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-cyan) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity var(--duration-base) var(--ease-smooth);
+    }
+    
+    .env-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 12px 32px rgba(6, 182, 212, 0.2);
+    }
+    
+    .env-card:hover::before {
+      opacity: 0.05;
+    }
+    
+    .env-card-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .env-icon-wrapper {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: var(--bg-tertiary);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-base) var(--ease-smooth);
+    }
+    
+    .env-card:hover .env-icon-wrapper {
+      background: var(--accent-cyan);
+      transform: scale(1.1);
+    }
+    
+    .env-card h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    
+    .env-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-size: 0.9375rem;
+    }
+    
+    /* Progress Indicator */
+    .progress-steps {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 3rem;
+    }
+    
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-color);
+      transition: all var(--duration-base) var(--ease-smooth);
+    }
+    
+    .step-dot.active {
+      width: 32px;
+      border-radius: 4px;
+      background: var(--accent-cyan);
+    }
+    
+    /* === INTERACTIVE ENVIRONMENT === */
+    #interactiveEnvironment {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+      background: var(--bg-primary);
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+    
+    .sidebar-section {
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    .sidebar-section:last-child {
+      border-bottom: none;
+    }
+    
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin-bottom: 1rem;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-smooth);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+    
+    .nav-item:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    
+    .nav-item.active {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--accent-cyan);
+    }
+    
+    /* Main Canvas */
+    .environment-canvas {
+      padding: 2rem;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .canvas-header {
+      margin-bottom: 2rem;
+    }
+    
+    .canvas-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .canvas-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    /* Spatial View */
+    .spatial-view {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 3rem;
+      min-height: 500px;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    
+    .zone-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .zone-node {
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all var(--duration-base) var(--ease-smooth);
+      position: relative;
+    }
+    
+    .zone-node::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      border-radius: 12px;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--success));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity var(--duration-base) var(--ease-smooth);
+    }
+    
+    .zone-node:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .zone-node:hover::before {
+      opacity: 1;
+    }
+    
+    .zone-node.selected {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.05);
+    }
+    
+    .zone-node.alert {
+      border-color: var(--danger);
+      background: var(--danger-dim);
+      animation: alertPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes alertPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    }
+    
+    .zone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .zone-name {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .status-indicator.normal {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+    
+    .status-indicator.alert {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      animation-duration: 1s;
+    }
+    
+    .zone-type {
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+    
+    .zone-reading {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+    
+    /* Details Panel */
+    .details-panel {
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-color);
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+    }
+    
+    .panel-header {
+      margin-bottom: 2rem;
+    }
+    
+    .panel-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .panel-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    .panel-section {
+      margin-bottom: 2rem;
+    }
+    
+    .panel-section-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    .stat-value {
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.025em;
+      text-transform: uppercase;
+    }
+    
+    .badge-success {
+      background: var(--success-dim);
+      color: var(--success);
+    }
+    
+    .badge-warning {
+      background: var(--warning-dim);
+      color: var(--warning);
+    }
+    
+    .badge-danger {
+      background: var(--danger-dim);
+      color: var(--danger);
+    }
+    
+    .badge-info {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--accent-cyan);
+    }
+    
+    /* Action Buttons in Panel */
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    
+    .btn-block {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    /* === SIMULATOR MODAL === */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 22, 40, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      animation: fadeIn var(--duration-base) var(--ease-smooth);
+    }
+    
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+      animation: slideUp var(--duration-slow) var(--ease-out);
+    }
+    
+    .modal-header {
+      padding: 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .modal-description {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+    
+    .modal-body {
+      padding: 2rem;
+    }
+    
+    .modal-footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.9375rem;
+    }
+    
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9375rem;
+      transition: all var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+    
+    /* Scenario Cards */
+    .scenario-grid {
+      display: grid;
+      gap: 1rem;
+    }
+    
+    .scenario-card {
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .scenario-card:hover {
+      border-color: var(--accent-cyan);
+    }
+    
+    .scenario-card.selected {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.05);
+    }
+    
+    .scenario-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .scenario-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    
+    /* === RESPONSIVE === */
+    @media (max-width: 1024px) {
+      #interactiveEnvironment {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar, .details-panel {
+        display: none;
+      }
+      
+      .welcome-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .isometric-scene {
+        max-width: 300px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+      
+      .environment-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .zone-map {
+        grid-template-columns: 1fr;
+      }
+      
+      .cta-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- WELCOME SCREEN -->
+  <section id="welcomeScreen" class="fade-in">
+    <div class="ambient-layer">
+      <div class="ambient-orb orb-1"></div>
+      <div class="ambient-orb orb-2"></div>
+    </div>
+    
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <div class="brand-lockup">
+          <div class="brand-icon">
+            <svg class="icon-md" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 4L4 10V16C4 22 8 26 16 28C24 26 28 22 28 16V10L16 4Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 16L14.5 18.5L20 13" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>Aire Seguro<br>Hogar Seguro</h1>
+            <p>Supervisión Inteligente de Gas</p>
+          </div>
+        </div>
+        
+        <h2 class="hero-title">Explora tu espacio.<br>Comprende el riesgo.</h2>
+        <p class="hero-subtitle">Descubre cómo funciona la detección temprana de fugas de gas a través de una experiencia interactiva diseñada para explorar, comprender y poner a prueba.</p>
+        
+        <div class="cta-group">
+          <button class="btn btn-primary" onclick="startExperience()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Explorar mi entorno
+          </button>
+          <button class="btn btn-ghost" onclick="showHow()">
+            Ver cómo funciona
+          </button>
+        </div>
+      </div>
+      
+      <div class="scene-container">
+        <div class="isometric-scene">
+          <svg class="scene-svg" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Isometric Kitchen Scene -->
+            <!-- Floor -->
+            <path d="M200 350L50 275L50 200L200 275L350 200L350 275L200 350Z" fill="#1e2d42" stroke="#334155" stroke-width="2"/>
+            
+            <!-- Counter -->
+            <path d="M100 200L100 150L250 125L250 175L100 200Z" fill="#162238" stroke="#334155" stroke-width="2"/>
+            <path d="M250 125L300 150L300 200L250 175L250 125Z" fill="#1e2d42" stroke="#334155" stroke-width="2"/>
+            <path d="M100 150L250 125L300 150L150 175L100 150Z" fill="#1f2937" stroke="#334155" stroke-width="2"/>
+            
+            <!-- Stove -->
+            <rect x="150" y="165" width="40" height="8" fill="#06b6d4" opacity="0.3" rx="2"/>
+            <rect x="200" y="160" width="40" height="8" fill="#06b6d4" opacity="0.3" rx="2"/>
+            
+            <!-- Sensor 1 (on wall) -->
+            <g class="sensor-pulse">
+              <circle cx="120" cy="120" r="6" fill="#06b6d4"/>
+              <circle cx="120" cy="120" r="10" fill="none" stroke="#06b6d4" stroke-width="2" opacity="0.3"/>
+            </g>
+            
+            <!-- Sensor 2 (ceiling) -->
+            <g class="sensor-pulse" style="animation-delay: 0.5s">
+              <circle cx="280" cy="180" r="6" fill="#10b981"/>
+              <circle cx="280" cy="180" r="10" fill="none" stroke="#10b981" stroke-width="2" opacity="0.3"/>
+            </g>
+            
+            <!-- Connection lines -->
+            <line class="connection-line" x1="120" y1="120" x2="200" y2="200" stroke="#06b6d4" stroke-width="1.5" opacity="0.4"/>
+            <line class="connection-line" x1="280" y1="180" x2="200" y2="200" stroke="#10b981" stroke-width="1.5" opacity="0.4" style="animation-delay: 0.3s"/>
+            
+            <!-- Central Hub -->
+            <circle cx="200" cy="200" r="15" fill="#162238" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="200" cy="200" r="8" fill="#06b6d4" opacity="0.5">
+              <animate attributeName="r" from="8" to="12" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" from="0.5" to="0" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENVIRONMENT SELECTOR -->
+  <section id="environmentSelector" class="hidden">
+    <div class="selector-container">
+      <div class="selector-header slide-up">
+        <h2>Elige tu entorno</h2>
+        <p>Selecciona el tipo de espacio que deseas explorar</p>
+      </div>
+      
+      <div class="environment-grid">
+        <div class="env-card slide-up" onclick="selectEnvironment('restaurant')" style="animation-delay: 100ms">
+          <div class="env-card-content">
+            <div class="env-icon-wrapper">
+              <svg class="icon-lg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 18V38C8 40 10 42 12 42H36C38 42 40 40 40 38V18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M6 18H42V14C42 12 40 10 38 10H10C8 10 6 12 6 14V18Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 26H32M16 32H24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Restaurante</h3>
+            <p>Cocina comercial con múltiples zonas de preparación y almacenamiento</p>
+          </div>
+        </div>
+        
+        <div class="env-card slide-up" onclick="selectEnvironment('home')" style="animation-delay: 200ms">
+          <div class="env-card-content">
+            <div class="env-icon-wrapper">
+              <svg class="icon-lg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 20L24 8L40 20V40C40 41 39 42 38 42H10C9 42 8 41 8 40V20Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 42V28H30V42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Hogar</h3>
+            <p>Espacio residencial con áreas de cocina y zonas personalizables</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="progress-steps">
+        <div class="step-dot"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 2rem;">
+        <button class="btn btn-ghost" onclick="goToWelcome()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Volver
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE ENVIRONMENT -->
+  <section id="interactiveEnvironment" class="hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-lockup" style="margin-bottom: 2rem;">
+        <div class="brand-icon" style="width: 40px; height: 40px;">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4L4 10V16C4 22 8 26 12 28C16 26 20 22 20 16V10L12 4Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 style="font-size: 1rem;">Aire Seguro</h1>
+          <p style="font-size: 0.75rem;">Hogar Seguro</p>
+        </div>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="section-title">Navegación</div>
+        <div class="nav-item active" onclick="showView('overview')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Vista General
+        </div>
+        <div class="nav-item" onclick="showView('simulator')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Simulador
+        </div>
+        <div class="nav-item" onclick="showView('alerts')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.29 3.86L1.82 18A2 2 0 003.54 20.985H20.47A2 2 0 0022.193 18L13.71 3.86A2 2 0 0010.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Alertas
+        </div>
+        <div class="nav-item" onclick="showView('history')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Historial
+        </div>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="section-title">Progreso</div>
+        <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+            <span style="color: var(--text-secondary);">Configuración</span>
+            <span style="font-weight: 600;">75%</span>
+          </div>
+          <div style="background: var(--border-color); height: 6px; border-radius: 3px; overflow: hidden;">
+            <div style="background: linear-gradient(90deg, var(--accent-cyan), var(--success)); height: 100%; width: 75%; transition: width var(--duration-slow) var(--ease-smooth);"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: auto;">
+        <button class="btn btn-secondary btn-block" onclick="goToWelcome()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Salir
+        </button>
+      </div>
+    </aside>
+    
+    <!-- Main Canvas -->
+    <main class="environment-canvas">
+      <div class="canvas-header">
+        <h1 class="canvas-title" id="environmentName">Mi Restaurante</h1>
+        <div class="canvas-meta">
+          <div class="meta-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="14" y="14" width="7" height="7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3" y="14" width="7" height="7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="zoneCount">3 zonas</span>
+          </div>
+          <div class="meta-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+            <span id="sensorCount">3 sensores</span>
+          </div>
+          <div class="meta-item">
+            <span class="badge badge-info">SIMULACIÓN</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="spatial-view">
+        <div class="zone-map" id="zoneMap">
+          <!-- Zones will be rendered here -->
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 2rem;">
+        <button class="btn btn-primary" onclick="openSimulator()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="5 3 19 12 5 21 5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="currentColor"/>
+          </svg>
+          Pon a prueba tu entorno
+        </button>
+      </div>
+    </main>
+    
+    <!-- Details Panel -->
+    <aside class="details-panel" id="detailsPanel">
+      <div class="panel-header">
+        <div class="panel-title" id="panelTitle">Selecciona una zona</div>
+        <div class="panel-subtitle" id="panelSubtitle">Haz clic en una zona para ver sus detalles</div>
+      </div>
+      
+      <div id="panelContent">
+        <!-- Content will be rendered dynamically -->
+      </div>
+    </aside>
+  </section>
+
+  <!-- SIMULATOR MODAL -->
+  <div id="simulatorModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Pon a prueba tu entorno</h2>
+        <p class="modal-description">Selecciona un escenario y observa cómo responde el sistema</p>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Zona afectada</label>
+          <select class="form-select" id="simulatorZone">
+            <option value="">Seleccionar zona...</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Escenario de simulación</label>
+          <div class="scenario-grid">
+            <div class="scenario-card" onclick="selectScenario('minor')">
+              <div class="scenario-title">Fuga Menor</div>
+              <div class="scenario-desc">Incremento gradual - Umbral de precaución</div>
+            </div>
+            <div class="scenario-card" onclick="selectScenario('major')">
+              <div class="scenario-title">Fuga Significativa</div>
+              <div class="scenario-desc">Incremento rápido - Umbral de alerta</div>
+            </div>
+            <div class="scenario-card" onclick="selectScenario('critical')">
+              <div class="scenario-title">Fuga Crítica</div>
+              <div class="scenario-desc">Incremento súbito - Alerta inmediata</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeSimulator()">Cancelar</button>
+        <button class="btn btn-primary" onclick="runSimulation()" id="runSimBtn" disabled>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="5 3 19 12 5 21 5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="currentColor"/>
+          </svg>
+          Iniciar Simulación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === STATE MANAGEMENT ===
+    const state = {
+      currentScreen: 'welcome',
+      environment: null,
+      zones: [],
+      selectedZone: null,
+      alerts: [],
+      history: [],
+      simulationConfig: {
+        zone: null,
+        scenario: null
+      }
+    };
+    
+    // === NAVIGATION ===
+    function startExperience() {
+      hideScreen('welcomeScreen');
+      showScreen('environmentSelector');
+      state.currentScreen = 'selector';
+    }
+    
+    function goToWelcome() {
+      hideScreen('environmentSelector');
+      hideScreen('interactiveEnvironment');
+      showScreen('welcomeScreen');
+      state.currentScreen = 'welcome';
+    }
+    
+    function selectEnvironment(type) {
+      state.environment = type;
+      initializeEnvironment(type);
+      hideScreen('environmentSelector');
+      showScreen('interactiveEnvironment');
+      state.currentScreen = 'environment';
+    }
+    
+    function showScreen(id) {
+      const screen = document.getElementById(id);
+      screen.classList.remove('hidden');
+    }
+    
+    function hideScreen(id) {
+      const screen = document.getElementById(id);
+      screen.classList.add('hidden');
+    }
+    
+    function showHow() {
+      alert('Esta funcionalidad mostraría un video o tutorial interactivo explicando el sistema.');
+    }
+    
+    // === ENVIRONMENT INITIALIZATION ===
+    function initializeEnvironment(type) {
+      if (type === 'restaurant') {
+        state.zones = [
+          { id: 1, name: 'Cocina Principal', type: 'kitchen', status: 'normal', delta: 15, sensor: true },
+          { id: 2, name: 'Almacén', type: 'storage', status: 'normal', delta: 8, sensor: true },
+          { id: 3, name: 'Área de Preparación', type: 'prep', status: 'normal', delta: 12, sensor: true }
+        ];
+        document.getElementById('environmentName').textContent = 'Mi Restaurante';
+      } else {
+        state.zones = [
+          { id: 1, name: 'Cocina', type: 'kitchen', status: 'normal', delta: 10, sensor: true },
+          { id: 2, name: 'Sala de Estar', type: 'living', status: 'normal', delta: 5, sensor: false },
+          { id: 3, name: 'Comedor', type: 'dining', status: 'normal', delta: 7, sensor: true }
+        ];
+        document.getElementById('environmentName').textContent = 'Mi Hogar';
+      }
+      
+      renderZones();
+      updateMetrics();
+      populateSimulatorZones();
+    }
+    
+    // === ZONE RENDERING ===
+    function renderZones() {
+      const container = document.getElementById('zoneMap');
+      container.innerHTML = '';
+      
+      state.zones.forEach((zone, index) => {
+        const zoneEl = document.createElement('div');
+        zoneEl.className = `zone-node ${zone.status} ${state.selectedZone?.id === zone.id ? 'selected' : ''}`;
+        zoneEl.style.animationDelay = `${index * 100}ms`;
+        zoneEl.classList.add('slide-up');
+        zoneEl.onclick = () => selectZone(zone);
+        
+        zoneEl.innerHTML = `
+          <div class="zone-header">
+            <div class="zone-name">${zone.name}</div>
+            <div class="status-indicator ${zone.status}"></div>
+          </div>
+          <div class="zone-type">${getZoneTypeLabel(zone.type)}</div>
+          <div class="zone-reading">Δ ${zone.delta}</div>
+          ${zone.sensor ? '<div style="margin-top: 0.75rem;"><span class="badge badge-info">Sensor activo</span></div>' : ''}
+        `;
+        
+        container.appendChild(zoneEl);
+      });
+    }
+    
+    function getZoneTypeLabel(type) {
+      const labels = {
+        kitchen: 'Cocina',
+        storage: 'Almacenamiento',
+        prep: 'Preparación',
+        living: 'Sala',
+        dining: 'Comedor'
+      };
+      return labels[type] || type;
+    }
+    
+    // === ZONE SELECTION ===
+    function selectZone(zone) {
+      state.selectedZone = zone;
+      renderZones();
+      renderZoneDetails(zone);
+    }
+    
+    function renderZoneDetails(zone) {
+      const panel = document.getElementById('panelContent');
+      document.getElementById('panelTitle').textContent = zone.name;
+      document.getElementById('panelSubtitle').textContent = getZoneTypeLabel(zone.type);
+      
+      panel.innerHTML = `
+        <div class="panel-section">
+          <div class="panel-section-title">Estado Actual</div>
+          <div class="stat-row">
+            <div class="stat-label">Estado</div>
+            <div class="stat-value">
+              <span class="badge badge-${zone.status === 'alert' ? 'danger' : 'success'}">
+                ${zone.status === 'alert' ? 'ALERTA' : 'NORMAL'}
+              </span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Delta</div>
+            <div class="stat-value">${zone.delta}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Sensor</div>
+            <div class="stat-value">${zone.sensor ? 'Conectado' : 'No disponible'}</div>
+          </div>
+        </div>
+        
+        <div class="panel-section">
+          <div class="panel-section-title">Acciones</div>
+          <div class="action-group">
+            <button class="btn btn-primary btn-block" onclick="openSimulatorForZone(${zone.id})">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Simular fuga
+            </button>
+            ${zone.status === 'alert' ? `
+              <button class="btn btn-secondary btn-block" onclick="resetZone(${zone.id})">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Reiniciar zona
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+    
+    // === METRICS ===
+    function updateMetrics() {
+      document.getElementById('zoneCount').textContent = `${state.zones.length} zonas`;
+      const sensorCount = state.zones.filter(z => z.sensor).length;
+      document.getElementById('sensorCount').textContent = `${sensorCount} sensores`;
+    }
+    
+    // === SIMULATOR ===
+    function openSimulator() {
+      document.getElementById('simulatorModal').classList.remove('hidden');
+      populateSimulatorZones();
+    }
+    
+    function openSimulatorForZone(zoneId) {
+      openSimulator();
+      document.getElementById('simulatorZone').value = zoneId;
+      state.simulationConfig.zone = zoneId;
+      updateSimulatorButton();
+    }
+    
+    function closeSimulator() {
+      document.getElementById('simulatorModal').classList.add('hidden');
+      state.simulationConfig = { zone: null, scenario: null };
+      document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
+    }
+    
+    function populateSimulatorZones() {
+      const select = document.getElementById('simulatorZone');
+      select.innerHTML = '<option value="">Seleccionar zona...</option>';
+      
+      state.zones.forEach(zone => {
+        const option = document.createElement('option');
+        option.value = zone.id;
+        option.textContent = zone.name;
+        select.appendChild(option);
+      });
+      
+      select.onchange = (e) => {
+        state.simulationConfig.zone = e.target.value ? parseInt(e.target.value) : null;
+        updateSimulatorButton();
+      };
+    }
+    
+    function selectScenario(scenario) {
+      document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+      state.simulationConfig.scenario = scenario;
+      updateSimulatorButton();
+    }
+    
+    function updateSimulatorButton() {
+      const btn = document.getElementById('runSimBtn');
+      btn.disabled = !state.simulationConfig.zone || !state.simulationConfig.scenario;
+    }
+    
+    function runSimulation() {
+      const { zone: zoneId, scenario } = state.simulationConfig;
+      const zone = state.zones.find(z => z.id === parseInt(zoneId));
+      
+      if (!zone) return;
+      
+      // Simulate leak
+      const deltaValues = {
+        minor: 180,
+        major: 350,
+        critical: 450
+      };
+      
+      zone.status = 'alert';
+      zone.delta = deltaValues[scenario];
+      
+      // Add alert
+      const alert = {
+        id: Date.now(),
+        zoneId: zone.id,
+        zoneName: zone.name,
+        scenario: scenario,
+        delta: zone.delta,
+        timestamp: new Date(),
+        acknowledged: false
+      };
+      
+      state.alerts.push(alert);
+      state.history.push({
+        ...alert,
+        type: 'simulation'
+      });
+      
+      // Close modal
+      closeSimulator();
+      
+      // Update UI
+      renderZones();
+      if (state.selectedZone?.id === zone.id) {
+        renderZoneDetails(zone);
+      }
+      
+      // Show notification
+      showNotification(`SIMULACIÓN ACTIVADA\n\nZona: ${zone.name}\nEscenario: ${getScenarioLabel(scenario)}\nDelta: ${zone.delta}\n\nRevisa los detalles de la zona o el centro de alertas.`);
+    }
+    
+    function getScenarioLabel(scenario) {
+      const labels = {
+        minor: 'Fuga Menor',
+        major: 'Fuga Significativa',
+        critical: 'Fuga Crítica'
+      };
+      return labels[scenario] || scenario;
+    }
+    
+    function resetZone(zoneId) {
+      const zone = state.zones.find(z => z.id === zoneId);
+      if (!zone) return;
+      
+      zone.status = 'normal';
+      zone.delta = Math.floor(Math.random() * 20);
+      
+      renderZones();
+      if (state.selectedZone?.id === zone.id) {
+        renderZoneDetails(zone);
+      }
+    }
+    
+    function showNotification(message) {
+      alert(message);
+    }
+    
+    // === VIEW SWITCHING ===
+    function showView(view) {
+      // Update active nav
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+      
+      // This would switch between different views
+      // For now, we'll just show a placeholder
+      if (view !== 'overview') {
+        alert(`Vista "${view}" - Esta funcionalidad mostraría la vista correspondiente del dashboard profesional.`);
+      }
+    }
+    
+    // === INITIALIZE ===
+    document.addEventListener('DOMContentLoaded', () => {
+      // Any initialization code
+    });
+  </script>
+</body>
+</html>
