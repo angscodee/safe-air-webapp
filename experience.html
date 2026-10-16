@@ -96,6 +96,28 @@
       50% { opacity: 0.8; }
     }
     
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+    }
+    
     /* Icons */
     .icon {
       width: 20px;
@@ -1234,7 +1256,42 @@
     }
     
     function showHow() {
-      alert('Esta funcionalidad mostraría un video o tutorial interactivo explicando el sistema.');
+      // Crear modal con video
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      };
+      
+      modal.innerHTML = `
+        <div class="modal" style="max-width: 900px;">
+          <div class="modal-header">
+            <h2 class="modal-title">Cómo Funciona el Sistema</h2>
+            <p class="modal-description">Video demostrativo de la plataforma IoT de detección de fugas</p>
+          </div>
+          <div class="modal-body" style="padding: 0;">
+            <video 
+              src="assets/videos/video demo.mp4" 
+              controls 
+              autoplay
+              style="width: 100%; border-radius: 0 0 8px 8px; background: #000;">
+              Tu navegador no soporta la reproducción de video.
+            </video>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+              Cerrar
+            </button>
+            <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); startExperience();">
+              Probar Ahora
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
     }
     
     // === ENVIRONMENT INITIALIZATION ===
@@ -1520,7 +1577,52 @@
     }
     
     function showNotification(message) {
-      alert(message);
+      // Crear notificación elegante en lugar de alert() nativo
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        max-width: 400px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--accent-cyan);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      notification.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <h3 style="font-size: 1.125rem; font-weight: 700; margin: 0; color: var(--accent-cyan);">
+            <svg style="width: 20px; height: 20px; vertical-align: middle; margin-right: 0.5rem;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.29 3.86L1.82 18A2 2 0 003.54 20.985H20.47A2 2 0 0022.193 18L13.71 3.86A2 2 0 0010.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Notificación
+          </h3>
+          <button onclick="this.closest('div').remove()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; line-height: 1; padding: 0;">×</button>
+        </div>
+        <div style="white-space: pre-line; color: var(--text-primary); font-size: 0.9375rem; line-height: 1.6;">
+          ${message}
+        </div>
+        <div style="margin-top: 1rem; text-align: right;">
+          <button onclick="this.closest('div').remove()" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+            Entendido
+          </button>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remover después de 10 segundos
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.style.animation = 'slideOut 0.3s ease-in';
+          setTimeout(() => notification.remove(), 300);
+        }
+      }, 10000);
     }
     
     // === VIEW SWITCHING ===
